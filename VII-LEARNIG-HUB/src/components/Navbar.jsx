@@ -2,55 +2,63 @@ import { useContext } from "react";
 import { AuthContext } from "../store/AuthContext";
 
 export default function Navbar() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, darkMode, toggleTheme } = useContext(AuthContext);
+
+  const s = {
+    nav: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "15px 60px",
+      borderBottom: darkMode ? "1px solid #1e293b" : "1px solid #e2e8f0",
+      backgroundColor: darkMode
+        ? "rgba(15, 23, 42, 0.8)"
+        : "rgba(255, 255, 255, 0.8)",
+      backdropFilter: "blur(12px)",
+      position: "sticky",
+      top: 0,
+      zIndex: 1000,
+    },
+    themeBtn: {
+      background: "none",
+      border: "none",
+      fontSize: "20px",
+      cursor: "pointer",
+      marginRight: "20px",
+    },
+    logout: {
+      backgroundColor: darkMode ? "#334155" : "#f1f5f9",
+      color: darkMode ? "#f1f5f9" : "#0f172a",
+      border: "none",
+      padding: "8px 16px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "600",
+    },
+  };
 
   return (
-    <nav style={styles.nav}>
-      <div style={styles.logo}>VIPZY Academy</div>
-      <div style={styles.navItems}>
-        <span style={styles.welcome}>
-          Welcome, <strong>{user?.name || "Academic"}</strong>
-        </span>
-        <button onClick={logout} style={styles.logoutBtn}>
+    <nav style={s.nav}>
+      <div
+        style={{
+          fontWeight: "900",
+          fontSize: "22px",
+          color: darkMode ? "#818cf8" : "#4f46e5",
+        }}
+      >
+        VEE.
+      </div>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <button onClick={toggleTheme} style={s.themeBtn}>
+          {darkMode ? "☀️" : "🌙"}
+        </button>
+        <div style={{ marginRight: "20px", fontSize: "14px" }}>
+          {user?.name}
+        </div>
+        <button onClick={logout} style={s.logout}>
           Logout
         </button>
       </div>
     </nav>
   );
 }
-
-const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px 40px",
-    backgroundColor: "#2c3e50",
-    color: "white",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  },
-  logo: {   fontSize: "20px", 
-            fontWeight: "bold", 
-            letterSpacing: "1px"
-         },
-
-  navItems: { 
-                display: "flex", 
-                alignItems: "center", 
-                gap: "20px" 
-            },
-
-  welcome: { 
-            fontSize: "14px" 
-            },
-
-  logoutBtn: {
-    backgroundColor: "#e74c3c",
-    color: "white",
-    border: "none",
-    padding: "8px 15px",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
-};
