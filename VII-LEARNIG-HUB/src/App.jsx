@@ -3,6 +3,7 @@ import { AuthProvider } from "./store/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import CataloguePage from "./pages/CataloguePage";
+import ModuleDetail from "./pages/ModuleDetail"; // New Page
 
 export default function App() {
   return (
@@ -10,12 +11,21 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-
           <Route
             path="/catalog"
             element={
               <ProtectedRoute>
                 <CataloguePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dynamic route for specific courses */}
+          <Route
+            path="/module/:id"
+            element={
+              <ProtectedRoute>
+                <ModuleDetail />
               </ProtectedRoute>
             }
           />
