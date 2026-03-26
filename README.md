@@ -2,11 +2,13 @@
 THIS IS AN E-LEARNING PLATFORM BUILT WITH REACT
 VEE is a premium, full-stack educational ecosystem engineered for the modern builder. It bridges the gap between basic tutorials and professional mastery in fields like Web3, UI/UX, and Data Analysis. With a focus on a "Captivating" user experience, VEE features a cinematic dark mode, high-performance video streaming, and an intelligent progression system.
 
+---
 
 ##  The Vision
 
 In an era of information overload, **VEE** provides a curated, distraction-free environment. Every pixel is engineered to keep the learner focused, from the typography to the glassmorphic interface that adapts perfectly to both desktop and mobile viewports.
 
+---
 
 ##  Key Features
 
@@ -18,7 +20,7 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
   * **Integrated Cinema Player:** A 16:9 responsive video interface designed for high-intensity technical learning.
 
 
-
+---
 ## 🛠 Tech Stack
 
 **1. Core Architecture**
@@ -43,22 +45,23 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
 * **Dynamic Logic Gates:** Custom JavaScript logic that handles the **"Sequential Unlock"** system (locking Lesson 2 until Lesson 1 is marked complete).
 
 
-
+---
 
 
 ## SCREENSHOT
-### 1\. Entrance & Authentication
+### 1 Entrance & Authentication
 
     ![LoginPage](./VII-LEARNIG-HUB/src/assets/screenshot/phonelogin.png)
 
-### 2\. The Learning Tracks (Catalogue)
+### 2 The Learning Tracks (Catalogue)
 
     ![CataloguePage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilehome.png)
 
-### 3\. The Interactive Classroom
+### 3 The Interactive Classroom
 
     ![LessonPage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilelesson.png)
 
+---
 
 ## 📖 How to Navigate VEE
 
