@@ -8,6 +8,23 @@ VEE is a premium, full-stack educational ecosystem engineered for the modern bui
 
 In an era of information overload, **VEE** provides a curated, distraction-free environment. Every pixel is engineered to keep the learner focused, from the typography to the glassmorphic interface that adapts perfectly to both desktop and mobile viewports.
 
+
+---
+
+
+## SCREENSHOT
+- 1 Entrance & Authentication
+
+    ![LoginPage](./VII-LEARNIG-HUB/src/assets/screenshot/phonelogin.png)
+
+- 2 The Learning Tracks (Catalogue)
+
+    ![CataloguePage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilehome.png)
+
+- 3 The Interactive Classroom
+
+    ![LessonPage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilelesson.png)
+
 ---
 
 ##  Key Features
@@ -45,21 +62,6 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
 * **Dynamic Logic Gates:** Custom JavaScript logic that handles the **"Sequential Unlock"** system (locking Lesson 2 until Lesson 1 is marked complete).
 
 
----
-
-
-## SCREENSHOT
-### 1 Entrance & Authentication
-
-    ![LoginPage](./VII-LEARNIG-HUB/src/assets/screenshot/phonelogin.png)
-
-### 2 The Learning Tracks (Catalogue)
-
-    ![CataloguePage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilehome.png)
-
-### 3 The Interactive Classroom
-
-    ![LessonPage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilelesson.png)
 
 ---
 
