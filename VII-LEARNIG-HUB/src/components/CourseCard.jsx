@@ -19,7 +19,7 @@ export default function CourseCard({ course }) {
       height: "140px",
       borderRadius: "16px",
       marginBottom: "20px",
-      background: "linear-gradient(45deg, #4f46e5, #9333ea)",
+      background:"linear-gradient(45deg, #4f46e5, #9333ea)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -40,7 +40,9 @@ export default function CourseCard({ course }) {
   return (
     <div style={s.card}>
       <div style={s.image}>
-        <span style={{ fontSize: "40px" }}>🎓</span>
+        <span style={{ fontSize: "40px" }}>
+        
+        </span>
       </div>
       <span style={{ fontSize: "12px", color: "#818cf8", fontWeight: "bold" }}>
         {course.level}
