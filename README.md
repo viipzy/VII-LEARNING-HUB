@@ -38,7 +38,7 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
 
 
 ---
-## 🛠 Tech Stack
+##  Tech Stack
 
 **1. Core Architecture**
 * **React.js (v18+):** The declarative engine used to build the interactive UI and handle complex state logic.
@@ -65,7 +65,7 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
 
 ---
 
-## 📖 How to Navigate VEE
+##  How to Navigate VEE
 
 1.  **Initialize Session:** Enter your credentials on the landing page to generate your local academic profile.
 2.  **Select a Frontier:** Use the **Search Bar** or **Level Filter** to find a track that matches your career goals.
@@ -76,7 +76,7 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
 
 
 
-## 📥 Local Installation
+## Local Installation
 
 ```bash
 # 1. Clone the repository
