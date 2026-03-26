@@ -4,68 +4,87 @@ import Navbar from "../components/Navbar";
 import CourseCard from "../components/CourseCard";
 import SearchFilter from "../components/SearchFilter";
 
-const DATA = [
-  {
-    id: 1,
-    title: "Web3 Ecosystems",
-    description: "Advanced blockchain and DAO governance.",
-    level: "Advanced",
-  },
-  {
-    id: 2,
-    title: "UI/UX Engineering",
-    description: "Premium design psychology and interfaces.",
-    level: "Intermediate",
-  },
-  {
-    id: 3,
-    title: "Agro-Valorization",
-    description: "Star apple peel waste-to-resource research.",
-    level: "Beginner",
-  },
-  {
-    id: 4,
-    title: "Forex Mechanics",
-    description: "Institutional trading and risk protocols.",
-    level: "Advanced",
-  },
-];
-
+// Ensure the "export default" keywords are exactly like this:
 export default function CataloguePage() {
   const { darkMode } = useContext(AuthContext);
   const [search, setSearch] = useState("");
+  const [level, setLevel] = useState("All");
 
-  const filtered = DATA.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  const DATA = [
+    {
+      id: "web2",
+      title: "Web2 Engineering",
+      description: "Fullstack JS development from HTML to Node.js.",
+      level: "Beginner",
+    },
+    {
+      id: "uiux",
+      title: "UI/UX Strategy",
+      description: "Modern design psychology and Figma mastery.",
+      level: "Intermediate",
+    },
+    {
+      id: "web3",
+      title: "Web3 & Smart Contracts",
+      description: "Blockchain, Solidity, and DAO architecture.",
+      level: "Advanced",
+    },
+    {
+      id: "data-analysis",
+      title: "Data Analysis",
+      description: "Python, SQL, and statistical visualization.",
+      level: "Intermediate",
+    },
+    {
+      id: "forex",
+      title: "Forex Mechanics",
+      description: "Institutional trading and technical analysis.",
+      level: "Professional",
+    },
+    {
+      id: "cybersecurity",
+      title: "Cybersecurity",
+      description: "Ethical hacking and network defense.",
+      level: "Advanced",
+    },
+  ];
+
+  const filtered = DATA.filter((c) => {
+    const matchesSearch = c.title.toLowerCase().includes(search.toLowerCase());
+    const matchesLevel = level === "All" || c.level === level;
+    return matchesSearch && matchesLevel;
+  });
 
   return (
-    <div>
+    <div
+      style={{
+        width: "100vw",
+        minHeight: "100vh",
+        backgroundColor: darkMode ? "#020617" : "#f8fafc",
+      }}
+    >
       <Navbar />
       <main
-        style={{ maxWidth: "1200px", margin: "0 auto", padding: "60px 20px" }}
+        style={{ maxWidth: "1400px", margin: "0 auto", padding: "40px 20px" }}
       >
         <header style={{ textAlign: "center", marginBottom: "60px" }}>
           <h1
             style={{
-              fontSize: "48px",
+              fontSize: "clamp(32px, 5vw, 48px)",
               fontWeight: "900",
               letterSpacing: "-2px",
             }}
           >
-            Curated <span style={{ color: "#818cf8" }}>Excellence</span>
+            Academic <span style={{ color: "#818cf8" }}>Repository</span>
           </h1>
-          <p style={{ color: "#94a3b8" }}>
-            Select your academic progression path.
-          </p>
         </header>
 
-        <SearchFilter setSearch={setSearch} />
+        <SearchFilter setSearch={setSearch} setLevel={setLevel} />
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
             gap: "30px",
           }}
         >
@@ -77,3 +96,42 @@ export default function CataloguePage() {
     </div>
   );
 }
+
+const DATA = [
+  {
+    id: "web2",
+    title: "Web2 Engineering",
+    description: "Fullstack JS development from HTML to Node.js.",
+    level: "Beginner",
+  },
+  {
+    id: "uiux",
+    title: "UI/UX Strategy",
+    description: "Modern design psychology and Figma mastery.",
+    level: "Intermediate",
+  },
+  {
+    id: "web3",
+    title: "Web3 & Smart Contracts",
+    description: "Blockchain, Solidity, and DAO architecture.",
+    level: "Advanced",
+  },
+  {
+    id: "data-analysis",
+    title: "Data Analysis",
+    description: "Python, SQL, and statistical visualization.",
+    level: "Intermediate",
+  },
+  {
+    id: "forex",
+    title: "Forex Mechanics",
+    description: "Institutional trading and technical analysis.",
+    level: "Professional",
+  },
+  {
+    id: "cybersecurity",
+    title: "Cybersecurity",
+    description: "Ethical hacking and network defense.",
+    level: "Advanced",
+  },
+];
