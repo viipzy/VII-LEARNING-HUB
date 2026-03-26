@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../store/AuthContext";
-import { COURSE_DB } from "../data/courses"; // Import the database
+import { COURSE_DB } from "../data/courses";
 import Navbar from "../components/Navbar";
 
 export default function ModuleDetail() {
-  const { id } = useParams(); // 'id' will be 'web2', 'uiux', etc.
+  const { id } = useParams();
   const navigate = useNavigate();
   const { darkMode } = useContext(AuthContext);
 
@@ -39,38 +39,73 @@ export default function ModuleDetail() {
       minHeight: "100vh",
       backgroundColor: darkMode ? "#020617" : "#f8fafc",
     },
-    main: { maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" },
-    videoCard: {
+    main: {
+      width: "100%",
+      maxWidth: "1400px",
+      margin: "0 auto",
+      padding: "20px",
+    },
+    videoWrapper: {
       width: "100%",
       aspectRatio: "16/9",
-      borderRadius: "24px",
+      borderRadius: "16px",
       overflow: "hidden",
-      boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
       background: "#000",
+      boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
     },
-    sidebar: {
-      marginTop: "40px",
+    contentSection: {
+      marginTop: "30px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "20px",
+    },
+    btn: {
+      padding: "16px 30px",
+      borderRadius: "14px",
+      background: "#6366f1",
+      color: "#fff",
+      border: "none",
+      fontWeight: "600", // Medium-bold Poppins
+      cursor: "pointer",
+      fontSize: "15px",
+      fontFamily: "'Poppins', sans-serif",
+    },
+    curriculum: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
       gap: "15px",
+      marginTop: "30px",
     },
-    lessonItem: (isActive, isLocked) => ({
+    card: (active, locked) => ({
       padding: "20px",
       borderRadius: "16px",
-      cursor: isLocked ? "not-allowed" : "pointer",
-      background: isActive ? "#6366f1" : darkMode ? "#1e293b" : "#fff",
-      color: isActive ? "#fff" : darkMode ? "#f1f5f9" : "#0f172a",
-      opacity: isLocked ? 0.4 : 1,
-      transition: "all 0.2s ease",
-      border: "1px solid rgba(255,255,255,0.05)",
+      cursor: locked ? "not-allowed" : "pointer",
+      background: active ? "#6366f1" : darkMode ? "#1e293b" : "#fff",
+      opacity: locked ? 0.4 : 1,
+      transition: "0.2s",
+      border: active ? "none" : "1px solid rgba(255,255,255,0.05)",
     }),
   };
 
   return (
     <div style={s.page}>
       <Navbar />
-      <div style={s.main}>
-        <div style={s.videoCard}>
+      <main style={s.main}>
+        <button
+          onClick={() => navigate("/catalog")}
+          style={{
+            color: "#818cf8",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: "bold",
+            marginBottom: "20px",
+          }}
+        >
+          ← Return to Frontier
+        </button>
+
+        <div style={s.videoWrapper}>
           <iframe
             width="100%"
             height="100%"
@@ -80,67 +115,62 @@ export default function ModuleDetail() {
           ></iframe>
         </div>
 
-        <div
-          style={{
-            marginTop: "30px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "20px",
-          }}
-        >
-          <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "900" }}>
-              {lessons[currentIdx].title}
-            </h1>
-            <p style={{ color: "#94a3b8" }}>
-              {courseData.title} • Module {currentIdx + 1} of 10
-            </p>
-          </div>
-          <button
-            onClick={handleNext}
+        <div style={s.contentSection}>
+          <div
             style={{
-              padding: "15px 35px",
-              borderRadius: "14px",
-              background: "#6366f1",
-              color: "#fff",
-              border: "none",
-              fontWeight: "bold",
-              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "15px",
             }}
           >
-            Mark Complete & Next
-          </button>
-        </div>
-
-        <div style={s.sidebar}>
-          {lessons.map((lesson, index) => {
-            const isLocked =
-              index > 0 && !completedLessons.includes(lessons[index - 1].id);
-            return (
-              <div
-                key={lesson.id}
-                style={s.lessonItem(currentIdx === index, isLocked)}
-                onClick={() => !isLocked && setCurrentIdx(index)}
+            <div>
+              <h1
+                style={{
+                  fontSize: "clamp(22px, 4vw, 32px)",
+                  fontWeight: "900",
+                }}
               >
+                {lessons[currentIdx].title}
+              </h1>
+              <p style={{ color: "#94a3b8" }}>
+                Part {currentIdx + 1} of 10 • {courseData.title}
+              </p>
+            </div>
+            <button onClick={handleNext} style={s.btn}>
+              {currentIdx === 9 ? "Complete Track" : "Next Lesson →"}
+            </button>
+          </div>
+
+          <div style={s.curriculum}>
+            {lessons.map((ls, i) => {
+              const locked =
+                i > 0 && !completedLessons.includes(lessons[i - 1].id);
+              return (
                 <div
-                  style={{
-                    fontSize: "12px",
-                    opacity: 0.7,
-                    marginBottom: "5px",
-                  }}
+                  key={ls.id}
+                  style={s.card(currentIdx === i, locked)}
+                  onClick={() => !locked && setCurrentIdx(i)}
                 >
-                  LESSON {index + 1}
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      opacity: 0.6,
+                      marginBottom: "4px",
+                    }}
+                  >
+                    MODULE {i + 1}
+                  </div>
+                  <div style={{ fontWeight: "700" }}>
+                    {ls.title} {locked ? "🔒" : ""}
+                  </div>
                 </div>
-                <div style={{ fontWeight: "bold" }}>
-                  {lesson.title} {isLocked ? "🔒" : ""}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
