@@ -1,13 +1,34 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
+  // 1. Initialize from localStorage so refresh doesn't log you out
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("gida_user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  const login = (userData) => setUser(userData);
-  const logout = () => setUser(null);
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("gida_theme");
+    return savedTheme !== null ? JSON.parse(savedTheme) : true;
+  });
+
+  // 2. Sync changes to localStorage
+  useEffect(() => {
+    localStorage.setItem("gida_theme", JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  const login = (userData) => {
+    setUser(userData);
+    localStorage.setItem("gida_user", JSON.stringify(userData));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("gida_user");
+  };
+
   const toggleTheme = () => setDarkMode(!darkMode);
 
   return (
@@ -19,8 +40,8 @@ export const AuthProvider = ({ children }) => {
           backgroundColor: darkMode ? "#020617" : "#f8fafc",
           color: darkMode ? "#f1f5f9" : "#0f172a",
           minHeight: "100vh",
-          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-          fontFamily: "Inter, system-ui, sans-serif",
+          fontFamily: "'Poppins', sans-serif", // Explicitly reinforced
+          transition: "all 0.3s ease",
         }}
       >
         {children}
@@ -28,3 +49,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

@@ -7,15 +7,15 @@ export default function SearchFilter({ setSearch, setLevel }) {
   const s = {
     wrapper: {
       display: "flex",
-      gap: "12px",
+      gap: "10px",
       justifyContent: "center",
       marginBottom: "40px",
       width: "100%",
     },
     input: {
       flex: 1,
-      maxWidth: "500px",
-      padding: "14px 24px",
+      maxWidth: "190px",
+      padding: "14px 20px",
       borderRadius: "20px",
       border: "none",
       outline: "none",
@@ -24,7 +24,7 @@ export default function SearchFilter({ setSearch, setLevel }) {
       boxShadow: darkMode ? "none" : "0 4px 12px rgba(0,0,0,0.05)",
     },
     select: {
-      padding: "14px 20px",
+      padding: "10px 5px",
       borderRadius: "20px",
       border: "none",
       backgroundColor: darkMode ? "#1e293b" : "#fff",
