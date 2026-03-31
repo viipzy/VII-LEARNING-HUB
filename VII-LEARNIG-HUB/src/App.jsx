@@ -1,38 +1,65 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./store/AuthContext";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import CataloguePage from "./pages/CataloguePage";
-import ModuleDetail from "./pages/ModuleDetail"; // New Page
+import UserProfile from "./pages/UserProfile";
+import ModuleDetail from "./pages/ModuleDetail"; // 1. IMPORT THE NEW PAGE
+import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
+
+function AppLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
+}
 
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          {/* Public Route */}
+          <Route path="/" element={<LoginPage />} />
+
+          {/* Protected Routes */}
           <Route
-            path="/catalog"
+            path="/catalogue"
             element={
               <ProtectedRoute>
-                <CataloguePage />
+                <AppLayout>
+                  <CataloguePage />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
 
-          {/* Dynamic route for specific courses */}
           <Route
-            path="/module/:id"
+            path="/profile"
             element={
               <ProtectedRoute>
-                <ModuleDetail />
+                <AppLayout>
+                  <UserProfile />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* 2. ADD THE MISSING ROUTE HERE */}
+          <Route
+            path="/module/:courseId"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ModuleDetail />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
 }

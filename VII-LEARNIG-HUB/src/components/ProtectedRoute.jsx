@@ -1,12 +1,16 @@
-import {Navigate} from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../store/AuthContext";
 
-export const ProtectedRoute = ({children}) => {
-    const {user} = useAuth();
+export default function ProtectedRoute({ children }) {
+  // If you added a 'loading' state to your AuthContext earlier, bring it in here
+  const { user } = useContext(AuthContext);
 
-    if (!user) {
-        return <Navigate to="/login" replace />
-    }
+  // If there is no user, redirect to login
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
 
-    return children;
+  // If user exists, allow entry
+  return children;
 }
