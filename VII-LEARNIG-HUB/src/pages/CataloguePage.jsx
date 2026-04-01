@@ -40,7 +40,7 @@ export default function CataloguePage() {
       justifyContent:"center",
     },
 
-    // The Base Card Style
+    
     card: {
       position: "relative",
       height: "300px", 

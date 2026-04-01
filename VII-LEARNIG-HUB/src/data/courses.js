@@ -451,4 +451,90 @@ export const COURSE_DB = {
       },
     ],
   },
+
+  Javascript: {
+    id: "Javascript",
+    title: "JavaScript Mastery",
+    level: "Beginner",
+    image: "https://unsplash.com/photos/qaedPly-Uro/download?w=800",
+    description: "Learn JavaScript from scratch with Traversy.",
+    lessons: [
+      {
+        id: "Js_l1",
+        title: "1. JavaScript Under The Hood [1] - Thread & Call Stack",
+        video: "https://www.youtube.com/embed/-G9c4CMMUKc",
+      },
+      {
+        id: "js_l2",
+        title: "2. JavaScript Under The Hood [2] - Execution Context",
+        video: "https://www.youtube.com/embed/Fd9VaW0M7K4",
+      },
+      {
+        id: "js_l3",
+        title:
+          "3. JavaScript Under The Hood [3} - Asynchronous JavaScript, Task Queue & Event Loop",
+        video: "https://www.youtube.com/embed/28AXSTCpsyU",
+      },
+      {
+        id: "js_l4",
+        title: "4. JavaScript Under The Hood [4] - Memory Storage",
+        video: "https://www.youtube.com/embed/Hci9Bb4_fkA",
+      },
+      {
+        id: "js_l5",
+        title: "5. JavaScript Under The Hood [5] - JavaScript Engine Overview",
+        video: "https://www.youtube.com/embed/oc6faXVc54E",
+      },
+    ],
+
+    quiz: [
+      {
+        question: "What is the Call Stack used for in JavaScript?",
+        options: [
+          "Styling web pages",
+          "Managing function execution",
+          "Handling database queries",
+          "Creating UI components",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What is an Execution Context?",
+        options: [
+          "Where variables and functions are stored and executed",
+          "A type of loop",
+          "A browser feature",
+          "A JavaScript library",
+        ],
+        answer: 0,
+      },
+      {
+        question: "JavaScript is which type of language?",
+        options: [
+          "Multi-threaded",
+          "Single-threaded",
+          "No-thread",
+          "Dual-threaded",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What handles asynchronous operations in JavaScript?",
+        options: ["Call Stack", "DOM", "Event Loop", "Compiler"],
+        answer: 2,
+      },
+      {
+        question: "Where are variables stored in JavaScript?",
+        options: ["Heap Memory", "Call Stack", "GPU", "Browser Cache"],
+        answer: 0,
+      },
+
+      {
+        question:
+          "Build a simple Task Manager (To-Do App) using JavaScript concepts like DOM manipulation, event handling, and local storage. (requirement- Add new tasks, Mark tasks as completed, Delete tasks Persist tasks using localStorage)",
+        options: ["Yes", "No"],
+        answer: 0,
+      },
+    ],
+  },
 };
