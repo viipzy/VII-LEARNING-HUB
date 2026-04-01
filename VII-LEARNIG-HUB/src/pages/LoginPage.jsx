@@ -1,134 +1,255 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../store/AuthContext";
+import googleIcon from "../assets/google.png";
 
 export default function LoginPage() {
-  const [name, setName] = useState("");
-  const { login, darkMode, toggleTheme } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState(""); // NEW: For success messages
+  const [isLoading, setIsLoading] = useState(false);
+
+  // NEW: Pull in resetPassword from our updated Context
+  const { login, loginWithGoogle, resetPassword } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (name.trim()) {
-      login({ name: name });
-      navigate("/catalog");
+    setError("");
+    setMessage("");
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      setError("Incorrect email or password.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError("");
+    setMessage("");
+    try {
+      await loginWithGoogle();
+      navigate("/profile");
+    } catch (err) {
+      console.error("Google Auth Error:", err);
+      if (err.code === "auth/popup-closed-by-user") {
+        setError("Google sign-in was cancelled.");
+      } else if (
+        err.code === "auth/operation-not-supported-in-this-environment"
+      ) {
+        setError("Google Sign-In is not enabled in Firebase Console.");
+      } else {
+        setError("Failed to authenticate with Google.");
+      }
+    }
+  };
+
+  // NEW: Handle the Forgot Password click
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!email) {
+      return setError(
+        "Please enter your email address in the box above first.",
+      );
+    }
+
+    try {
+      await resetPassword(email);
+      setMessage("Password reset email sent! Check your inbox.");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to send reset email. Ensure your email is correct.");
     }
   };
 
   const s = {
-    container: {
+    page: {
       height: "100vh",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      position: "relative",
-      overflow: "hidden",
-    },
-    // Decorative background glow
-    glow: {
-      position: "absolute",
-      width: "500px",
-      height: "500px",
-      background:
-        "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%)",
-      top: "-100px",
-      left: "-100px",
-      zIndex: 0,
+      background: "#020617",
+      fontFamily: "'Poppins', sans-serif",
     },
     card: {
-      width: "100%",
-      maxWidth: "420px",
+      background: "#0f172a",
       padding: "50px 40px",
-      zIndex: 1,
-      backgroundColor: darkMode
-        ? "rgba(30, 41, 59, 0.5)"
-        : "rgba(255, 255, 255, 0.8)",
-      backdropFilter: "blur(16px)",
-      borderRadius: "32px",
-      border: darkMode
-        ? "1px solid rgba(255,255,255,0.1)"
-        : "1px solid rgba(0,0,0,0.05)",
-      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      borderRadius: "24px",
+      width: "100%",
+      maxWidth: "400px",
+      boxSizing: "border-box",
+      border: "1px solid rgba(255,255,255,0.05)",
+    },
+    logo: {
       textAlign: "center",
+      color: "#fff",
+      fontSize: "32px",
+      fontWeight: "900",
+      margin: "0 0 10px 0",
+      letterSpacing: "-1px",
+    },
+    subtitle: {
+      textAlign: "center",
+      color: "#94a3b8",
+      fontSize: "15px",
+      margin: "0 0 30px 0",
+    },
+    error: {
+      color: "#ef4444",
+      background: "rgba(239, 68, 68, 0.1)",
+      padding: "10px",
+      borderRadius: "8px",
+      textAlign: "center",
+      fontSize: "14px",
+      marginBottom: "20px",
+      fontWeight: "600",
+    },
+    success: {
+      color: "#10b981",
+      background: "rgba(16, 185, 129, 0.1)",
+      padding: "10px",
+      borderRadius: "8px",
+      textAlign: "center",
+      fontSize: "14px",
+      marginBottom: "20px",
+      fontWeight: "600",
     },
     input: {
-      width: "90%",
-      padding: "16px 20px",
-      borderRadius: "16px",
-      marginBottom: "20px",
-      border: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
-      backgroundColor: darkMode ? "#0f172a" : "#fff",
-      color: darkMode ? "#fff" : "#000",
-      fontSize: "16px",
-      outline: "none",
-      boxShadow: "inset 0 2px 4px rgba(0,0,0,0.05)",
-    },
-    button: {
       width: "100%",
-      padding: "16px",
-      borderRadius: "16px",
-      border: "none",
-      background: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
-      color: "white",
-      fontWeight: "800",
-      fontSize: "16px",
-      cursor: "pointer",
-      transition: "transform 0.2s",
-      boxShadow: "0 10px 15px -3px rgba(99, 102, 241, 0.3)",
+      padding: "14px",
+      marginBottom: "20px",
+      borderRadius: "10px",
+      border: "1px solid #334155",
+      background: "#020617",
+      color: "#fff",
+      fontSize: "15px",
+      boxSizing: "border-box",
     },
-    themeToggle: {
-      position: "absolute",
-      top: "20px",
-      right: "20px",
+    submitBtn: {
+      width: "100%",
+      padding: "14px",
+      background: "#6366f1",
+      color: "#fff",
+      border: "none",
+      borderRadius: "10px",
+      fontSize: "16px",
+      fontWeight: "700",
+      cursor: "pointer",
+      transition: "background 0.2s",
+      marginBottom: "20px",
+    },
+    linkBtn: {
+      display: "block",
+      textAlign: "center",
+      color: "#6366f1",
+      textDecoration: "none",
+      fontSize: "14px",
+      fontWeight: "600",
+      cursor: "pointer",
       background: "none",
       border: "none",
-      fontSize: "24px",
+      width: "100%",
+    },
+    divider: {
+      display: "flex",
+      alignItems: "center",
+      margin: "30px 0",
+      color: "#475569",
+      fontSize: "12px",
+      fontWeight: "600",
+    },
+    line: { flex: 1, height: "1px", background: "#334155" },
+    googleBtn: {
+      width: "100%",
+      padding: "14px",
+      background: "transparent",
+      color: "#fff",
+      border: "1px solid #334155",
+      borderRadius: "10px",
+      fontSize: "15px",
+      fontWeight: "600",
       cursor: "pointer",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "10px",
+      transition: "background 0.2s",
+    },
+    footerText: {
+      textAlign: "center",
+      color: "#94a3b8",
+      fontSize: "14px",
+      marginTop: "30px",
     },
   };
 
   return (
-    <div style={s.container}>
-      <div style={s.glow} />
-      <button onClick={toggleTheme} style={s.themeToggle}>
-        {darkMode ? "☀️" : "🌙"}
-      </button>
-
+    <div style={s.page}>
       <div style={s.card}>
-        <div style={{ marginBottom: "30px" }}>
-          <h1
-            style={{
-              fontSize: "32px",
-              fontWeight: "900",
-              margin: "0 0 10px 0",
-              letterSpacing: "-1px",
-            }}
-          >
-            VEE<span style={{ color: "#818cf8" }}>.</span>
-          </h1>
-          <p
-            style={{
-              color: darkMode ? "#94a3b8" : "#64748b",
-              fontSize: "14px",
-            }}
-          >
-            Access the elite academic app.
-          </p>
-        </div>
+        <h1 style={s.logo}>VEE.</h1>
+        <p style={s.subtitle}>Welcome back, Pioneer</p>
 
-        <form onSubmit={handleLogin}>
+        {error && <div style={s.error}>{error}</div>}
+        {message && <div style={s.success}>{message}</div>}
+
+        <form onSubmit={handleSubmit}>
           <input
-            type="text"
-            placeholder="Your Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             style={s.input}
             required
           />
-          <button type="submit" style={s.button}>
-            Initialize Session
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={s.input}
+          />
+          <button type="submit" style={s.submitBtn} disabled={isLoading}>
+            {isLoading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
+
+        {/* NEW: Connected the onClick handler */}
+        <button style={s.linkBtn} onClick={handleForgotPassword}>
+          Forgot Password?
+        </button>
+
+        <div style={s.divider}>
+          <div style={s.line}></div>
+          <span style={{ padding: "0 15px" }}>OR</span>
+          <div style={s.line}></div>
+        </div>
+
+        <button style={s.googleBtn} onClick={handleGoogleLogin}>
+          <img src={googleIcon} width="18" alt="Google" />
+          Continue with Google
+        </button>
+
+        <p style={s.footerText}>
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            style={{
+              color: "#6366f1",
+              textDecoration: "none",
+              fontWeight: "700",
+            }}
+          >
+            Sign Up
+          </Link>
+        </p>
       </div>
     </div>
   );
