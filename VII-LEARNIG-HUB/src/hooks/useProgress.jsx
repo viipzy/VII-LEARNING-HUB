@@ -83,12 +83,12 @@ export function useProgress() {
     }
   };
 
-  // NEW: Save Assessment Results
+ 
   const saveAssessment = async (courseId, quizScorePercentage, projectUrl) => {
     if (!user) return;
     const userRef = doc(db, "users", user.uid);
 
-    // We simulate "Project Approved" instantly for the user experience
+   
     await setDoc(
       userRef,
       {
