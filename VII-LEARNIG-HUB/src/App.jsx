@@ -6,6 +6,8 @@ import UserProfile from "./pages/UserProfile";
 import ModuleDetail from "./pages/ModuleDetail"; 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import SignupPage from './pages/SignupPage';
+
 
 function AppLayout({ children }) {
   return (
@@ -23,6 +25,8 @@ export default function App() {
         <Routes>
           {}
           <Route path="/" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+
 
           {}
           <Route
