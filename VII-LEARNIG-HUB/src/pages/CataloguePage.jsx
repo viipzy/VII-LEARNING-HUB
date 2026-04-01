@@ -5,10 +5,10 @@ import { COURSE_DB } from "../data/courses";
 export default function CataloguePage() {
   const navigate = useNavigate();
   const courses = Object.values(COURSE_DB);
-  const [hoveredCard, setHoveredCard] = useState(null); // Track which card is hovered
+  const [hoveredCard, setHoveredCard] = useState(null); 
 
   const s = {
-    // Page background with a subtle ambient glow
+   
     page: {
       minHeight: "100vh",
       padding: "60px 40px",
@@ -39,18 +39,20 @@ export default function CataloguePage() {
       alignItems:"center",
       justifyContent:"center",
     },
+
     // The Base Card Style
     card: {
       position: "relative",
-      height: "300px", // Taller for a more cinematic feel
+      height: "300px", 
       borderRadius: "24px",
       overflow: "hidden",
       cursor: "pointer",
       border: "1px solid rgba(255, 255, 255, 0.08)",
       backgroundColor: "#0f172a",
-      transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)", // Bouncy, smooth transition
+      transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)", 
       boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
     },
+
     imageContainer: {
       width: "100%",
       height: "100%",
@@ -60,14 +62,16 @@ export default function CataloguePage() {
       overflow: "hidden",
       zIndex: 1,
     },
+
     image: {
       width: "100%",
       height: "100%",
       objectFit: "cover",
-      transition: "transform 0.6s ease", // Smooth zoom effect
-      display: "block", // Crucial fix to ensure images render properly
+      transition: "transform 0.6s ease", 
+      display: "block",
     },
-    // The Glassmorphic text area
+
+    
     overlay: {
       position: "absolute",
       bottom: 0,
@@ -83,6 +87,7 @@ export default function CataloguePage() {
       justifyContent: "flex-end",
       transition: "transform 0.4s ease",
     },
+
     badge: {
       position: "absolute",
       top: "20px",
@@ -98,6 +103,7 @@ export default function CataloguePage() {
       backdropFilter: "blur(10px)",
       border: "1px solid rgba(192, 132, 252, 0.3)",
     },
+
     actionRow: {
       display: "flex",
       alignItems: "center",
@@ -111,6 +117,7 @@ export default function CataloguePage() {
       transition: "all 0.3s ease",
     },
   };
+
 
   return (
     <div style={s.page}>
@@ -155,7 +162,6 @@ export default function CataloguePage() {
                       transform: isHovered ? "scale(1.08)" : "scale(1)",
                     }}
                     onError={(e) => {
-                      // Ultimate Fallback: If image fails, generate a nice geometric pattern
                       e.target.src = `https://ui-avatars.com/api/?name=${course.title.replace(" ", "+")}&background=0f172a&color=6366f1&size=800&font-size=0.1`;
                     }}
                   />
@@ -185,7 +191,7 @@ export default function CataloguePage() {
                     {course.description}
                   </p>
 
-                  {/* Appears only on hover to guide the user */}
+                  {}
                   <div
                     style={{
                       ...s.actionRow,

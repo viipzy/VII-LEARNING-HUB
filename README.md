@@ -15,15 +15,19 @@ In an era of information overload, **VEE** provides a curated, distraction-free 
 ## SCREENSHOT
 - 1 Entrance & Authentication
 
-    ![LoginPage](./VII-LEARNIG-HUB/src/assets/screenshot/phonelogin.png)
+    ![LoginPage](./VII-LEARNIG-HUB/src/assets/screenshot/Defaultlogin.png)
+    ![Mobile LoginPage](./VII-LEARNIG-HUB/src/assets/screenshot/MobileLogin.png)
 
 - 2 The Learning Tracks (Catalogue)
 
-    ![CataloguePage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilehome.png)
+    ![Dashboard](./VII-LEARNIG-HUB/src/assets/screenshot/DAshboard.png)
+    ![Mobile Dashboard](./VII-LEARNIG-HUB/src/assets/screenshot/MDashboard.png)
 
 - 3 The Interactive Classroom
 
-    ![LessonPage](./VII-LEARNIG-HUB/src/assets/screenshot/mobilelesson.png)
+    ![LessonPage](./VII-LEARNIG-HUB/src/assets/screenshot/videopg.png)
+    ![Mobile LessonPage](./VII-LEARNIG-HUB/src/assets/screenshot/mVideo.png)
+
 
 ---
 

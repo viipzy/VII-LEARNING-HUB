@@ -260,7 +260,7 @@ export default function UserProfile() {
                 .cert-val.id { font-family: monospace; font-size: 11px; color: #475569; }
                 .download-btn { padding: 12px; background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; justify-content: center; gap: 8px; }
 
-                /* MOBILE FIXES */
+                /* MOBILE*/
                 @media (max-width: 768px) {
                     .dashboard-page { padding: 20px; }
                     .header-card { flex-direction: column; text-align: center; padding: 20px; }

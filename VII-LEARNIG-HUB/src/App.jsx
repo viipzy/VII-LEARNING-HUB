@@ -3,7 +3,7 @@ import { AuthProvider } from "./store/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import CataloguePage from "./pages/CataloguePage";
 import UserProfile from "./pages/UserProfile";
-import ModuleDetail from "./pages/ModuleDetail"; // 1. IMPORT THE NEW PAGE
+import ModuleDetail from "./pages/ModuleDetail"; 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 
@@ -21,10 +21,10 @@ export default function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Route */}
+          {}
           <Route path="/" element={<LoginPage />} />
 
-          {/* Protected Routes */}
+          {}
           <Route
             path="/catalogue"
             element={
@@ -47,7 +47,7 @@ export default function App() {
             }
           />
 
-          {/* 2. ADD THE MISSING ROUTE HERE */}
+          {}
           <Route
             path="/module/:courseId"
             element={

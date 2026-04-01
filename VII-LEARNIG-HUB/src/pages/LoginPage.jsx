@@ -7,10 +7,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState(""); // NEW: For success messages
+  const [message, setMessage] = useState(""); 
   const [isLoading, setIsLoading] = useState(false);
 
-  // NEW: Pull in resetPassword from our updated Context
+ 
   const { login, loginWithGoogle, resetPassword } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -49,7 +49,7 @@ export default function LoginPage() {
     }
   };
 
-  // NEW: Handle the Forgot Password click
+ 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setError("");
@@ -221,7 +221,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* NEW: Connected the onClick handler */}
+        {}
         <button style={s.linkBtn} onClick={handleForgotPassword}>
           Forgot Password?
         </button>
