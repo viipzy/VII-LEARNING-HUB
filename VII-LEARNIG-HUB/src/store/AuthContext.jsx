@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 export const AuthContext = createContext();
@@ -21,8 +22,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    // Diagnostic Fail-Safe: Force application to load after 5 seconds
-    // This prevents infinite blank screens caused by network drops
     const connectionTimeout = setTimeout(() => {
       if (loading) {
         console.warn(
@@ -53,8 +52,50 @@ export const AuthProvider = ({ children }) => {
     signInWithEmailAndPassword(auth, email, password);
   const loginWithGoogle = () => signInWithPopup(auth, googleProvider);
   const logout = () => signOut(auth);
+  const resetPassword = (email) => sendPasswordResetEmail(auth, email);
 
-  // Visual indicator of the loading state
+  // NEW: Client-Side Compression to bypass Firebase Storage paywall
+  const uploadAvatar = (file) => {
+    return new Promise((resolve, reject) => {
+      if (!user) return reject("No user logged in.");
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+
+        img.onload = async () => {
+          // Create a virtual canvas to resize the image
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 200; // Perfect size for avatars
+          const scaleSize = MAX_WIDTH / img.width;
+
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Convert the canvas drawing into a highly compressed text string
+          const base64String = canvas.toDataURL("image/jpeg", 0.8);
+
+          try {
+            // Save the text string directly to the free Auth profile
+            await updateProfile(user, { photoURL: base64String });
+            setUser({ ...user, photoURL: base64String });
+            resolve();
+          } catch (err) {
+            console.error("Profile Update Error:", err);
+            reject(err);
+          }
+        };
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   if (loading) {
     return (
       <div
@@ -75,7 +116,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, signup, login, loginWithGoogle, logout }}
+      value={{
+        user,
+        signup,
+        login,
+        loginWithGoogle,
+        logout,
+        resetPassword,
+        uploadAvatar,
+      }}
     >
       {children}
     </AuthContext.Provider>

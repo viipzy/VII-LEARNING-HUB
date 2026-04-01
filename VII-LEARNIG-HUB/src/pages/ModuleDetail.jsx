@@ -13,348 +13,261 @@ export default function ModuleDetail() {
     isLoadingProgress,
     enrollInCourse,
     markLessonComplete,
+    saveAssessment,
+    awardCertificate,
   } = useProgress();
 
-  // NEW: Processing state for the Enroll button
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentLesson, setCurrentLesson] = useState(
+    () => course?.lessons?.[0] || null,
+  );
 
-  const [currentLesson, setCurrentLesson] = useState(() => {
-    return course?.lessons && course.lessons.length > 0
-      ? course.lessons[0]
-      : null;
-  });
+  const [answers, setAnswers] = useState({});
+  const [projectUrl, setProjectUrl] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  useEffect(() => {
-    if (!course) navigate("/catalogue");
-  }, [course, navigate]);
+  if (!course || isLoadingProgress)
+    return <div style={{ background: "#020617", height: "100vh" }} />;
 
-  if (!course) return null;
+  const courseData = userProgress.courses?.[courseId] || {};
+  const isEnrolled = courseData.enrolled;
+  const completedLessons = courseData.completedLessons || [];
 
-  if (!course.lessons || course.lessons.length === 0) {
-    return (
-      <div
-        style={{
-          padding: "60px",
-          textAlign: "center",
-          color: "#ef4444",
-          background: "#020617",
-          height: "100vh",
-          fontFamily: "'Poppins', sans-serif",
-        }}
-      >
-        <h2>System Error: Missing Course Data</h2>
-        <p>
-          The lessons array for <b>{course.title}</b> is missing in your
-          courses.js file.
-        </p>
-      </div>
+  const isLastLesson =
+    course.lessons.findIndex((l) => l.id === currentLesson?.id) ===
+    course.lessons.length - 1;
+  const isReadyForAssessment =
+    isLastLesson && completedLessons.includes(currentLesson?.id);
+  const hasCertificate = !!userProgress.certificates?.[courseId];
+
+  const handleNextLesson = () => {
+    markLessonComplete(courseId, currentLesson.id);
+    const nextIdx =
+      course.lessons.findIndex((l) => l.id === currentLesson.id) + 1;
+    if (nextIdx < course.lessons.length) {
+      setCurrentLesson(course.lessons[nextIdx]);
+    }
+  };
+
+  const handleSubmitAssessment = async () => {
+    if (!projectUrl.includes("http"))
+      return alert("Please provide a valid URL for your project.");
+
+    let correctCount = 0;
+    course.quiz.forEach((q, index) => {
+      if (answers[index] === q.answer) correctCount++;
+    });
+    const scorePercentage = Math.round(
+      (correctCount / course.quiz.length) * 100,
     );
-  }
 
-  if (isLoadingProgress) {
-    return (
-      <div
-        style={{
-          height: "calc(100vh - 80px)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#818cf8",
-          fontSize: "18px",
-          background: "#020617",
-          fontFamily: "'Poppins', sans-serif",
-        }}
-      >
-        <span style={{ animation: "pulse 1.5s infinite" }}>
-          Verifying Enrollment Status...
-        </span>
-      </div>
-    );
-  }
+    if (scorePercentage < 70)
+      return alert(
+        `You scored ${scorePercentage}%. You need 70% to pass. Please review the material and try again.`,
+      );
 
-  const courseData = userProgress[courseId];
-  const isEnrolled = courseData?.enrolled;
-  const completedLessons = courseData?.completedLessons || [];
-  const progressPercentage =
-    Math.round((completedLessons.length / course.lessons.length) * 100) || 0;
-
-  const s = {
-    page: {
-      padding: "40px",
-      maxWidth: "1400px",
-      margin: "0 auto",
-      color: "#fff",
-      display: "flex",
-      gap: "30px",
-      flexWrap: "wrap",
-      fontFamily: "'Poppins', sans-serif",
-    },
-    cinema: {
-      flex: "1 1 800px",
-      background: "#0f172a",
-      borderRadius: "24px",
-      overflow: "hidden",
-      border: "1px solid rgba(255,255,255,0.08)",
-      boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
-    },
-    videoWrapper: {
-      position: "relative",
-      paddingBottom: "56.25%",
-      height: 0,
-      backgroundColor: "#000",
-    },
-    iframe: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      border: "none",
-    },
-    sidebar: {
-      flex: "1 1 350px",
-      background: "#0f172a",
-      borderRadius: "24px",
-      padding: "30px",
-      border: "1px solid rgba(255,255,255,0.08)",
-      maxHeight: "calc(100vh - 120px)",
-      overflowY: "auto",
-    },
-    enrollOverlay: {
-      position: "absolute",
-      inset: 0,
-      background: "rgba(2,6,23,0.95)",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 10,
-      backdropFilter: "blur(10px)",
-    },
-
-    lessonItem: (isActive, isDone, isLocked) => ({
-      padding: "16px",
-      borderRadius: "12px",
-      marginBottom: "12px",
-      cursor: isLocked || !isEnrolled ? "not-allowed" : "pointer",
-      background: isActive
-        ? "rgba(99, 102, 241, 0.15)"
-        : "rgba(255,255,255,0.02)",
-      border: `1px solid ${isActive ? "#6366f1" : "rgba(255,255,255,0.05)"}`,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      opacity: isLocked || !isEnrolled ? 0.4 : 1,
-      transition: "all 0.2s ease",
-      transform: isActive ? "scale(1.02)" : "scale(1)",
-    }),
+    setIsSubmittingReview(true);
+    setTimeout(async () => {
+      await saveAssessment(courseId, scorePercentage, projectUrl);
+      await awardCertificate(courseId);
+      setIsSubmittingReview(false);
+      alert(`Assessment Passed with ${scorePercentage}%! Project Approved.`);
+      navigate("/profile");
+    }, 2000);
   };
 
   return (
-    <div style={s.page}>
-      <div style={s.cinema}>
-        <div style={s.videoWrapper}>
-          {!isEnrolled && (
-            <div style={s.enrollOverlay}>
-              <h2
-                style={{
-                  fontSize: "32px",
-                  marginBottom: "15px",
-                  fontWeight: "800",
-                }}
-              >
-                Access Restricted
-              </h2>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  marginBottom: "30px",
-                  fontSize: "16px",
-                }}
-              >
-                Enroll in this track to unlock the curriculum.
-              </p>
-
-              {/* UPDATED ENROLL BUTTON */}
-              <button
-                onClick={async () => {
-                  setIsProcessing(true);
-                  const success = await enrollInCourse(courseId);
-                  if (!success) setIsProcessing(false);
-                }}
-                disabled={isProcessing}
-                style={{
-                  padding: "14px 36px",
-                  background: isProcessing
-                    ? "#475569"
-                    : "linear-gradient(135deg, #6366f1, #a855f7)",
-                  color: isProcessing ? "#94a3b8" : "#fff",
-                  border: "none",
-                  borderRadius: "12px",
-                  fontSize: "16px",
-                  fontWeight: "700",
-                  cursor: isProcessing ? "not-allowed" : "pointer",
-                  transition: "all 0.2s",
-                }}
-              >
-                {isProcessing ? "Authorizing Access..." : "Enroll Now"}
-              </button>
+    <div className="module-page">
+      <div className="main-player-col">
+        {!isReadyForAssessment ? (
+          <>
+            <div className="video-wrapper">
+              {!isEnrolled && (
+                <div className="enroll-overlay">
+                  <button
+                    className="enroll-btn"
+                    onClick={async () => {
+                      setIsProcessing(true);
+                      await enrollInCourse(courseId);
+                      setIsProcessing(false);
+                    }}
+                  >
+                    {isProcessing ? "Authorizing..." : "Enroll Now"}
+                  </button>
+                </div>
+              )}
+              <iframe src={currentLesson?.video} allowFullScreen />
             </div>
-          )}
-          {currentLesson && (
-            <iframe
-              src={currentLesson.video}
-              style={s.iframe}
-              allowFullScreen
-              title="Video Player"
-            />
-          )}
-        </div>
-
-        <div style={{ padding: "30px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          >
-            <div>
-              <h2
-                style={{
-                  fontSize: "26px",
-                  marginBottom: "10px",
-                  fontWeight: "700",
-                }}
-              >
-                {currentLesson?.title}
-              </h2>
-              <p style={{ color: "#94a3b8", lineHeight: "1.6" }}>
-                {course.description}
-              </p>
-            </div>
-
-            {isEnrolled &&
-              currentLesson &&
-              !completedLessons.includes(currentLesson.id) && (
+            <div className="video-info">
+              <h3>{currentLesson?.title}</h3>
+              {isEnrolled && !completedLessons.includes(currentLesson?.id) && (
                 <button
-                  onClick={() => {
-                    markLessonComplete(courseId, currentLesson.id);
-                    const currentIndex = course.lessons.findIndex(
-                      (l) => l.id === currentLesson.id,
-                    );
-                    if (currentIndex < course.lessons.length - 1) {
-                      setCurrentLesson(course.lessons[currentIndex + 1]);
-                    }
-                  }}
-                  style={{
-                    padding: "12px 24px",
-                    background: "#10b981",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontWeight: "700",
-                    whiteSpace: "nowrap",
-                  }}
+                  className="complete-btn"
+                  onClick={handleNextLesson}
+                  style={{ background: isLastLesson ? "#fbbf24" : "#10b981" }}
                 >
-                  Mark as Complete ✓
+                  {isLastLesson
+                    ? "Finish Track & Unlock Exam"
+                    : "Mark as Complete ✓"}
                 </button>
               )}
-          </div>
-        </div>
-      </div>
+            </div>
+          </>
+        ) : (
+          <div className="assessment-room">
+            <h2 style={{ color: "#fbbf24", marginBottom: "10px" }}>
+              Final Assessment Room
+            </h2>
+            <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
+              Pass the quiz (70% required) and submit your final project to
+              claim your certificate.
+            </p>
 
-      <div style={s.sidebar}>
-        <h3
-          style={{ fontSize: "22px", marginBottom: "15px", fontWeight: "800" }}
-        >
-          {course.title}
-        </h3>
-
-        <div style={{ marginBottom: "30px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              fontSize: "13px",
-              color: "#94a3b8",
-              marginBottom: "10px",
-              fontWeight: "600",
-            }}
-          >
-            <span>Track Progress</span>
-            <span style={{ color: "#fff" }}>{progressPercentage}%</span>
-          </div>
-          <div
-            style={{
-              width: "100%",
-              height: "8px",
-              background: "rgba(255,255,255,0.1)",
-              borderRadius: "4px",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                width: `${progressPercentage}%`,
-                height: "100%",
-                background: "linear-gradient(90deg, #818cf8, #c084fc)",
-                transition: "width 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {course.lessons?.map((lesson, index) => {
-            const isDone = completedLessons.includes(lesson.id);
-            const isActive = currentLesson?.id === lesson.id;
-
-            const isUnlocked =
-              index === 0 ||
-              completedLessons.includes(course.lessons[index - 1].id);
-            const isLocked = !isUnlocked;
-
-            return (
-              <div
-                key={lesson.id}
-                style={s.lessonItem(isActive, isDone, isLocked)}
-                onClick={() => {
-                  if (isEnrolled && !isLocked) setCurrentLesson(lesson);
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: isActive ? "700" : "500",
-                  }}
+            {hasCertificate ? (
+              <div className="success-box">
+                <h2 style={{ color: "#10b981", marginBottom: "10px" }}>
+                  Mastery Verified
+                </h2>
+                <p>Score: {courseData.quizScore}% | Project Approved</p>
+                <button
+                  className="view-cert-btn"
+                  onClick={() => navigate("/profile")}
                 >
-                  {lesson.title}
-                </span>
-
-                <div>
-                  {isDone && (
-                    <span style={{ color: "#10b981", fontSize: "16px" }}>
-                      ✔
-                    </span>
-                  )}
-                  {isLocked && !isDone && (
-                    <span style={{ color: "#64748b", fontSize: "14px" }}>
-                      🔒
-                    </span>
-                  )}
-                </div>
+                  View Certificate
+                </button>
               </div>
-            );
-          })}
+            ) : (
+              <>
+                <div style={{ marginBottom: "40px" }}>
+                  <h3 className="part-title">Part 1: Knowledge Check</h3>
+                  {course.quiz?.map((q, qIndex) => (
+                    <div key={qIndex} className="quiz-card">
+                      <p style={{ fontWeight: "600", marginBottom: "15px" }}>
+                        {qIndex + 1}. {q.question}
+                      </p>
+                      {q.options.map((opt, oIndex) => (
+                        <label
+                          key={oIndex}
+                          className={`quiz-option ${answers[qIndex] === oIndex ? "selected" : ""}`}
+                        >
+                          <input
+                            type="radio"
+                            checked={answers[qIndex] === oIndex}
+                            onChange={() =>
+                              setAnswers({ ...answers, [qIndex]: oIndex })
+                            }
+                          />
+                          {opt}
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ marginBottom: "40px" }}>
+                  <h3 className="part-title">Part 2: Project Submission</h3>
+                  <div className="quiz-card">
+                    <input
+                      type="url"
+                      placeholder="https://github.com/..."
+                      value={projectUrl}
+                      onChange={(e) => setProjectUrl(e.target.value)}
+                      className="project-input"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  className="submit-exam-btn"
+                  onClick={handleSubmitAssessment}
+                  disabled={
+                    isSubmittingReview ||
+                    Object.keys(answers).length < course.quiz.length ||
+                    !projectUrl
+                  }
+                >
+                  {isSubmittingReview
+                    ? "Grading..."
+                    : "Submit for Certification"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="sidebar-col">
+        <h3 style={{ marginBottom: "20px" }}>Curriculum</h3>
+        {course.lessons.map((lesson, idx) => {
+          const locked =
+            idx > 0 && !completedLessons.includes(course.lessons[idx - 1].id);
+          const isDone = completedLessons.includes(lesson.id);
+          const isActive =
+            currentLesson?.id === lesson.id && !isReadyForAssessment;
+          return (
+            <div
+              key={lesson.id}
+              onClick={() => !locked && setCurrentLesson(lesson)}
+              className={`lesson-item ${isActive ? "active" : ""} ${locked ? "locked" : ""}`}
+            >
+              <span>{lesson.title}</span>
+              <span>{locked ? "🔒" : isDone ? "✅" : ""}</span>
+            </div>
+          );
+        })}
+        <div
+          className={`lesson-item assessment ${isReadyForAssessment ? "active" : ""}`}
+        >
+          <span>🏆 Final Assessment</span>
+          <span>
+            {hasCertificate ? "✅" : isReadyForAssessment ? "▶" : "🔒"}
+          </span>
         </div>
       </div>
+
       <style>{`
-                @keyframes pulse {
-                    0% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                    100% { opacity: 1; }
+                .module-page { padding: 40px; max-width: 1400px; margin: 0 auto; color: #fff; display: flex; gap: 30px; font-family: 'Poppins', sans-serif; }
+                .main-player-col { flex: 1 1 800px; background: #0f172a; border-radius: 24px; overflow: hidden; border: 1px solid #1e293b; }
+                .sidebar-col { flex: 1 1 350px; background: #0f172a; border-radius: 24px; padding: 30px; border: 1px solid #1e293b; align-self: flex-start; max-height: 80vh; overflow-y: auto; }
+                
+                .video-wrapper { position: relative; padding-bottom: 56.25%; background-color: #000; }
+                .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+                .enroll-overlay { position: absolute; inset: 0; background: rgba(2,6,23,0.95); display: flex; justify-content: center; align-items: center; z-index: 10; }
+                .enroll-btn { padding: 14px 36px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+                .video-info { padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+                .complete-btn { padding: 12px 24px; color: #000; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
+                
+                .lesson-item { padding: 15px; border-radius: 10px; margin-bottom: 10px; background: transparent; border: 1px solid #334155; display: flex; justify-content: space-between; cursor: pointer; }
+                .lesson-item.active { background: #1e293b; border-color: #6366f1; }
+                .lesson-item.locked { opacity: 0.4; cursor: not-allowed; }
+                .lesson-item.assessment.active { background: rgba(251, 191, 36, 0.1); border-color: #fbbf24; color: #fbbf24; }
+
+                .assessment-room { padding: 40px; }
+                .success-box { background: rgba(16, 185, 129, 0.1); padding: 30px; border-radius: 15px; border: 1px solid #10b981; text-align: center; }
+                .view-cert-btn { padding: 12px 24px; background: #10b981; color: #fff; border: none; border-radius: 10px; margin-top: 20px; cursor: pointer; }
+                .part-title { border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px; }
+                .quiz-card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+                .quiz-option { display: block; margin-bottom: 10px; cursor: pointer; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid transparent; }
+                .quiz-option.selected { 
+                background: rgba(99, 102, 241, 0.2); border-color: #6366f1; }
+                .quiz-option input { margin-right: 10px; }
+                .project-input { 
+                width: 100%; 
+                padding: 15px; 
+                border-radius: 8px; 
+                border: 1px solid #334155; 
+                background: #0f172a; color: #fff; font-size: 16px; 
+                box-sizing: border-box; }
+                .submit-exam-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; border: none; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; }
+                .submit-exam-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+                /* MOBILE RESPONSIVENESS */
+                @media (max-width: 768px) {
+                    .module-page { flex-direction: column; padding: 15px; }
+                    .main-player-col, .sidebar-col { flex: 1 1 100%; width: 100%; }
+                    .video-info { flex-direction: column; gap: 15px; text-align: center; padding: 20px; }
+                    .complete-btn { width: 100%; }
+                    .assessment-room { padding: 20px; }
                 }
             `}</style>
     </div>

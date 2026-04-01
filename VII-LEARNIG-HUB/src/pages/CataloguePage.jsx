@@ -36,11 +36,13 @@ export default function CataloguePage() {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
       gap: "40px",
+      alignItems:"center",
+      justifyContent:"center",
     },
     // The Base Card Style
     card: {
       position: "relative",
-      height: "380px", // Taller for a more cinematic feel
+      height: "300px", // Taller for a more cinematic feel
       borderRadius: "24px",
       overflow: "hidden",
       cursor: "pointer",

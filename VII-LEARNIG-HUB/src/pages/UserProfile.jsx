@@ -1,20 +1,16 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../store/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useProgress } from "../hooks/useProgress";
 import { COURSE_DB } from "../data/courses";
+import html2canvas from "html2canvas";
 
 export default function UserProfile() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const { userProgress, isLoadingProgress } = useProgress();
+  const [downloadingId, setDownloadingId] = useState(null);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
-
-  // --- NEW: Loading State UI ---
   if (isLoadingProgress) {
     return (
       <div
@@ -30,248 +26,98 @@ export default function UserProfile() {
         }}
       >
         <span style={{ animation: "pulse 1.5s infinite" }}>
-          Syncing Command Center with Cloud...
+          Syncing Dashboard with Cloud...
         </span>
       </div>
     );
   }
 
-  // Calculate Dynamic Statistics based on Firebase Data
-  const enrolledCourses = Object.keys(userProgress || {});
-  let modulesMastered = 0;
-  let certificatesEarned = 0;
-
-  enrolledCourses.forEach((courseId) => {
-    const completedCount =
-      userProgress[courseId]?.completedLessons?.length || 0;
-    modulesMastered += completedCount;
-
-    const courseMeta = COURSE_DB[courseId];
-    const totalLessons = courseMeta?.lessons?.length || 1;
-
-    if (completedCount > 0 && completedCount === totalLessons) {
-      certificatesEarned += 1;
-    }
-  });
-
-  const s = {
-    page: {
-      padding: "40px",
-      maxWidth: "1200px",
-      margin: "0 auto",
-      color: "#fff",
-      fontFamily: "'Poppins', sans-serif",
-    },
-    headerCard: {
-      display: "flex",
-      alignItems: "center",
-      gap: "20px",
-      background: "#0f172a",
-      padding: "30px",
-      borderRadius: "24px",
-      border: "1px solid rgba(255,255,255,0.08)",
-      marginBottom: "40px",
-      boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-    },
-    pfp: {
-      width: "100px",
-      height: "100px",
-      borderRadius: "50%",
-      border: "4px solid #6366f1",
-      objectFit: "cover",
-    },
-    initialAvatar: {
-      width: "100px",
-      height: "100px",
-      borderRadius: "50%",
-      border: "4px solid #6366f1",
-      background: "linear-gradient(135deg, #6366f1, #a855f7)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "36px",
-      fontWeight: "bold",
-    },
-    statsGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-      gap: "20px",
-      marginBottom: "50px",
-    },
-    statBox: {
-      background: "#0f172a",
-      padding: "25px",
-      borderRadius: "20px",
-      border: "1px solid rgba(255,255,255,0.08)",
-      textAlign: "center",
-      boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-    },
-    statNumber: {
-      fontSize: "42px",
-      fontWeight: "800",
-      color: "#818cf8",
-      margin: "10px 0 0 0",
-    },
-    sectionTitle: {
-      fontSize: "24px",
-      fontWeight: "700",
-      borderBottom: "1px solid #1e293b",
-      paddingBottom: "15px",
-      marginBottom: "25px",
-      color: "#f8fafc",
-    },
-    trackGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-      gap: "25px",
-    },
-    trackCard: {
-      background: "#0f172a",
-      padding: "25px",
-      borderRadius: "20px",
-      border: "1px solid rgba(255,255,255,0.08)",
-      cursor: "pointer",
-      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-    },
-    emptyState: {
-      padding: "50px",
-      background: "#0f172a",
-      borderRadius: "20px",
-      border: "1px dashed #334155",
-      textAlign: "center",
-      color: "#94a3b8",
-      gridColumn: "1 / -1",
-    },
-  };
-
   if (!user) return null;
+
+  const safeCourses = userProgress?.courses || {};
+  const safeCertificates = userProgress?.certificates || {};
+  const enrolledCourses = Object.keys(safeCourses);
+
+  let modulesMastered = 0;
+  enrolledCourses.forEach((id) => {
+    modulesMastered += safeCourses[id]?.completedLessons?.length || 0;
+  });
+  const certificatesEarned = Object.keys(safeCertificates).length;
 
   const getInitial = () =>
     user.displayName ? user.displayName.charAt(0).toUpperCase() : "V";
 
-  return (
-    <div style={s.page}>
-      <h1
-        style={{
-          marginBottom: "30px",
-          fontSize: "32px",
-          fontWeight: "800",
-          background: "linear-gradient(to right, #818cf8, #c084fc)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        Dashboard
-      </h1>
+  const downloadCertificate = async (courseId, courseTitle) => {
+    setDownloadingId(courseId);
+    const certElement = document.getElementById(`certificate-${courseId}`);
+    if (certElement) {
+      try {
+        const canvas = await html2canvas(certElement, {
+          scale: 3,
+          backgroundColor: "#0f172a",
+          useCORS: true,
+        });
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `${user.displayName.replace(" ", "_")}_VEE_Certificate_${courseTitle.replace(" ", "_")}.png`;
+        link.click();
+      } catch (error) {
+        alert("Error generating certificate.");
+      }
+    }
+    setDownloadingId(null);
+  };
 
-      <div style={s.headerCard}>
+  return (
+    <div className="dashboard-page">
+      <h1 className="dash-title">Dashboard</h1>
+
+      <div className="header-card">
         {user.photoURL ? (
-          <img src={user.photoURL} alt="Profile" style={s.pfp} />
+          <img src={user.photoURL} alt="Profile" className="dash-pfp" />
         ) : (
-          <div style={s.initialAvatar}>{getInitial()}</div>
+          <div className="dash-initial">{getInitial()}</div>
         )}
-        <div>
-          <h2
-            style={{ fontSize: "28px", margin: "0 0 5px 0", fontWeight: "700" }}
-          >
-            {user.displayName || "Digital Pioneer"}
-          </h2>
-          <p style={{ color: "#94a3b8", margin: 0, fontSize: "15px" }}>
-            {user.email}
-          </p>
+        <div className="dash-user-info">
+          <h2>{user.displayName || "Digital Pioneer"}</h2>
+          <p>{user.email}</p>
           <button
-            onClick={handleLogout}
-            style={{
-              marginTop: "15px",
-              padding: "8px 20px",
-              background: "rgba(239, 68, 68, 0.1)",
-              color: "#ef4444",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "600",
-              transition: "all 0.2s",
+            className="signout-btn"
+            onClick={async () => {
+              await logout();
+              navigate("/");
             }}
-            onMouseOver={(e) => (e.target.style.background = "#ef4444")}
-            onMouseOut={(e) =>
-              (e.target.style.background = "rgba(239, 68, 68, 0.1)")
-            }
           >
             Sign Out
           </button>
         </div>
       </div>
 
-      <div style={s.statsGrid}>
-        <div style={s.statBox}>
-          <p
-            style={{
-              color: "#94a3b8",
-              margin: 0,
-              fontSize: "13px",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              fontWeight: "600",
-            }}
-          >
-            Active Tracks
-          </p>
-          <h3 style={s.statNumber}>{enrolledCourses.length}</h3>
+      <div className="stats-grid">
+        <div className="stat-box">
+          <p>Active Tracks</p>
+          <h3>{enrolledCourses.length}</h3>
         </div>
-        <div style={s.statBox}>
-          <p
-            style={{
-              color: "#94a3b8",
-              margin: 0,
-              fontSize: "13px",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              fontWeight: "600",
-            }}
-          >
-            Modules Mastered
-          </p>
-          <h3 style={s.statNumber}>{modulesMastered}</h3>
+        <div className="stat-box">
+          <p>Modules Mastered</p>
+          <h3>{modulesMastered}</h3>
         </div>
-        <div style={s.statBox}>
-          <p
-            style={{
-              color: "#94a3b8",
-              margin: 0,
-              fontSize: "13px",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              fontWeight: "600",
-            }}
-          >
-            Certificates Earned
-          </p>
-          <h3 style={s.statNumber}>{certificatesEarned}</h3>
+        <div className="stat-box">
+          <p>Certificates</p>
+          <h3>{certificatesEarned}</h3>
         </div>
       </div>
 
-      <h2 style={s.sectionTitle}>In-Progress Tracks</h2>
-
-      <div style={s.trackGrid}>
+      <h2 className="section-title">In-Progress Tracks</h2>
+      <div className="track-grid">
         {enrolledCourses.length === 0 ? (
-          <div style={s.emptyState}>
-            <h3 style={{ color: "#fff", marginBottom: "10px" }}>
-              No Active Deployments
-            </h3>
-            <p style={{ marginBottom: "20px" }}>
-              You haven't enrolled in any specialization tracks yet.
-            </p>
+          <div className="empty-state">
+            <h3>No Active Deployments</h3>
+            <p>You haven't enrolled in any specialization tracks yet.</p>
             <button
+              className="explore-btn"
               onClick={() => navigate("/catalogue")}
-              style={{
-                padding: "12px 24px",
-                background: "#6366f1",
-                color: "#fff",
-                border: "none",
-                borderRadius: "10px",
-                cursor: "pointer",
-                fontWeight: "600",
-              }}
             >
               Explore the Frontier
             </button>
@@ -281,8 +127,8 @@ export default function UserProfile() {
             const courseMeta = COURSE_DB[courseId];
             if (!courseMeta) return null;
 
-            const progressData = userProgress[courseId];
-            const completed = progressData.completedLessons?.length || 0;
+            const completed =
+              safeCourses[courseId]?.completedLessons?.length || 0;
             const total = courseMeta.lessons?.length || 1;
             const percent = Math.round((completed / total) * 100);
 
@@ -290,88 +136,25 @@ export default function UserProfile() {
               <div
                 key={courseId}
                 onClick={() => navigate(`/module/${courseId}`)}
-                style={s.trackCard}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 15px 30px rgba(0,0,0,0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="track-card"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "15px",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <img
-                    src={courseMeta.image}
-                    style={{
-                      width: "70px",
-                      height: "70px",
-                      borderRadius: "12px",
-                      objectFit: "cover",
-                    }}
-                    alt={courseMeta.title}
-                  />
+                <div className="track-card-header">
+                  <img src={courseMeta.image} alt={courseMeta.title} />
                   <div>
-                    <h4
-                      style={{
-                        margin: "0 0 6px 0",
-                        fontSize: "18px",
-                        fontWeight: "700",
-                        color: "#fff",
-                      }}
-                    >
-                      {courseMeta.title}
-                    </h4>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "13px",
-                        color: "#94a3b8",
-                        fontWeight: "500",
-                      }}
-                    >
+                    <h4>{courseMeta.title}</h4>
+                    <p>
                       {completed} of {total} Modules Completed
                     </p>
                   </div>
                 </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "8px",
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: "#cbd5e1",
-                  }}
-                >
+                <div className="progress-text">
                   <span>Track Progress</span>
                   <span>{percent}%</span>
                 </div>
-                <div
-                  style={{
-                    width: "100%",
-                    height: "8px",
-                    background: "rgba(255,255,255,0.05)",
-                    borderRadius: "4px",
-                    overflow: "hidden",
-                  }}
-                >
+                <div className="progress-bar-bg">
                   <div
-                    style={{
-                      width: `${percent}%`,
-                      height: "100%",
-                      background: "linear-gradient(90deg, #818cf8, #c084fc)",
-                      transition: "width 1s cubic-bezier(0.4, 0, 0.2, 1)",
-                    }}
+                    className="progress-bar-fill"
+                    style={{ width: `${percent}%` }}
                   />
                 </div>
               </div>
@@ -380,11 +163,112 @@ export default function UserProfile() {
         )}
       </div>
 
+      <h2 className="section-title gold-title">Verified Credentials</h2>
+      <div className="track-grid cert-grid">
+        {Object.keys(safeCertificates).length === 0 ? (
+          <div className="empty-state">
+            <p style={{ color: "#64748b" }}>
+              Complete a track, pass the quiz, and submit your project to earn
+              your first certificate.
+            </p>
+          </div>
+        ) : (
+          Object.keys(safeCertificates).map((id) => {
+            const cert = safeCertificates[id];
+            const courseTitle = COURSE_DB[id]?.title;
+            return (
+              <div
+                key={id}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                }}
+              >
+                <div id={`certificate-${id}`} className="cert-card">
+                  <div className="cert-watermark">V</div>
+                  <h4>VEE PROFESSIONAL CERTIFICATE</h4>
+                  <h3>{courseTitle}</h3>
+                  <p className="presented">Presented to</p>
+                  <p className="cert-name">{user.displayName}</p>
+                  <div className="cert-footer">
+                    <div>
+                      <p className="cert-label">Issue Date</p>
+                      <p className="cert-val">{cert.issueDate}</p>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <p className="cert-label">Credential ID</p>
+                      <p className="cert-val id">{cert.certId}</p>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  className="download-btn"
+                  onClick={() => downloadCertificate(id, courseTitle)}
+                  disabled={downloadingId === id}
+                >
+                  {downloadingId === id
+                    ? "Generating PNG..."
+                    : "⬇ Download Certificate"}
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+
       <style>{`
-                @keyframes pulse {
-                    0% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                    100% { opacity: 1; }
+                .dashboard-page { padding: 40px; max-width: 1200px; margin: 0 auto; color: #fff; font-family: 'Poppins', sans-serif; }
+                .dash-title { margin-bottom: 30px; font-size: 32px; font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                .header-card { display: flex; align-items: center; gap: 20px; background: #0f172a; padding: 30px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 40px; }
+                .dash-pfp { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #6366f1; object-fit: cover; }
+                .dash-initial { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #6366f1; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; flex-shrink: 0; }
+                .dash-user-info h2 { font-size: 28px; margin: 0 0 5px 0; font-weight: 700; }
+                .dash-user-info p { color: #94a3b8; margin: 0; font-size: 15px; }
+                .signout-btn { margin-top: 15px; padding: 8px 20px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; cursor: pointer; font-weight: 600; }
+                
+                .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 50px; }
+                .stat-box { background: #0f172a; padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
+                .stat-box p { color: #94a3b8; margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+                .stat-box h3 { font-size: 42px; font-weight: 800; color: #818cf8; margin: 10px 0 0 0; }
+                
+                .section-title { font-size: 24px; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px; }
+                .gold-title { color: #fbbf24; border-color: rgba(251, 191, 36, 0.2); }
+                .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; margin-bottom: 50px; }
+                .track-card { background: #0f172a; padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: transform 0.2s; }
+                .track-card:hover { transform: translateY(-5px); }
+                .track-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+                .track-card-header img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; }
+                .track-card-header h4 { margin: 0 0 6px 0; font-size: 18px; color: #fff; }
+                .track-card-header p { margin: 0; font-size: 13px; color: #94a3b8; }
+                .progress-text { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: #cbd5e1; }
+                .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+                .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #818cf8, #c084fc); }
+                
+                .empty-state { padding: 50px; background: #0f172a; border-radius: 20px; border: 1px dashed #334155; text-align: center; grid-column: 1 / -1; }
+                .explore-btn { padding: 12px 24px; background: #6366f1; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+                
+                .cert-card { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 30px; border-radius: 20px; border: 2px solid #fbbf24; position: relative; overflow: hidden; }
+                .cert-watermark { position: absolute; top: -20px; right: -10px; font-size: 100px; color: rgba(251, 191, 36, 0.05); font-weight: 900; line-height: 1; }
+                .cert-card h4 { color: #fbbf24; font-size: 11px; letter-spacing: 2px; margin: 0 0 15px 0; }
+                .cert-card h3 { margin: 10px 0; font-size: 22px; }
+                .presented { font-size: 14px; color: #cbd5e1; margin: 20px 0 0 0; }
+                .cert-name { font-size: 18px; color: #fff; margin: 5px 0; font-weight: bold; }
+                .cert-footer { display: flex; justify-content: space-between; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+                .cert-label { font-size: 10px; color: #64748b; margin: 0; text-transform: uppercase; }
+                .cert-val { font-size: 12px; color: #94a3b8; margin: 5px 0 0 0; }
+                .cert-val.id { font-family: monospace; font-size: 11px; color: #475569; }
+                .download-btn { padding: 12px; background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; justify-content: center; gap: 8px; }
+
+                /* MOBILE FIXES */
+                @media (max-width: 768px) {
+                    .dashboard-page { padding: 20px; }
+                    .header-card { flex-direction: column; text-align: center; padding: 20px; }
+                    .dash-initial { width: 80px; height: 80px; font-size: 28px; }
+                    .stats-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+                    .stat-box h3 { font-size: 32px; }
+                    .track-grid { grid-template-columns: 1fr; gap: 15px; }
+                    .cert-card { padding: 20px; }
                 }
             `}</style>
     </div>

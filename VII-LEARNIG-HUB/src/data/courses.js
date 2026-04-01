@@ -59,6 +59,43 @@ export const COURSE_DB = {
         video: "https://www.youtube.com/embed/F9gB5b4jgOI?si=7KfyjGEgwlGzaur_",
       },
     ],
+    quiz: [
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Text Markup Language",
+          "Home Tool Markup Language",
+          "Hyperlinks and Text Markup Language",
+          "Hyper Tool Multi Language",
+        ],
+        answer: 0,
+      },
+      {
+        question: "Which CSS property controls the text size?",
+        options: ["text-style", "font-size", "text-size", "font-weight"],
+        answer: 1,
+      },
+      {
+        question: "How do you declare a JavaScript variable?",
+        options: [
+          "v carName;",
+          "variable carName;",
+          "let carName;",
+          "declare carName;",
+        ],
+        answer: 2,
+      },
+      {
+        question: "What is React primarily used for?",
+        options: [
+          "Building databases",
+          "Building user interfaces",
+          "Server-side logic",
+          "Writing CSS",
+        ],
+        answer: 1,
+      },
+    ],
   },
   uiux: {
     id: "uiux",
@@ -119,6 +156,43 @@ export const COURSE_DB = {
         video: "https://www.youtube.com/embed/Kmp85DeC3K4",
       },
     ],
+    quiz: [
+      {
+        question: "What is the primary goal of UX design?",
+        options: [
+          "Making it look pretty",
+          "Solving user problems",
+          "Writing code",
+          "Creating logos",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What is a Wireframe?",
+        options: [
+          "A low-fidelity structural blueprint",
+          "A fully colored design",
+          "A database schema",
+          "A CSS file",
+        ],
+        answer: 0,
+      },
+      {
+        question: "Which tool is industry standard for UI Design?",
+        options: ["Microsoft Word", "Figma", "Notepad", "Excel"],
+        answer: 1,
+      },
+      {
+        question: "What does Auto Layout in Figma do?",
+        options: [
+          "Auto-saves your work",
+          "Creates responsive components",
+          "Generates React code",
+          "Writes text for you",
+        ],
+        answer: 1,
+      },
+    ],
   },
   web3: {
     id: "web3",
@@ -145,6 +219,44 @@ export const COURSE_DB = {
         video: "https://www.youtube.com/embed/gyMwXuJrbJQ",
       },
     ],
+
+    quiz: [
+      {
+        question: "What is a Smart Contract?",
+        options: [
+          "A PDF document",
+          "Self-executing code on a blockchain",
+          "A legal contract",
+          "A database",
+        ],
+        answer: 1,
+      },
+      {
+        question: "Which language is used for Ethereum smart contracts?",
+        options: ["Python", "Solidity", "Java", "C++"],
+        answer: 1,
+      },
+      {
+        question: "What is a dApp?",
+        options: [
+          "Decentralized Application",
+          "Data App",
+          "Desktop App",
+          "Digital Application",
+        ],
+        answer: 0,
+      },
+      {
+        question: "What does a blockchain miner do?",
+        options: [
+          "Extracts metals",
+          "Validates network transactions",
+          "Hacks wallets",
+          "Writes CSS",
+        ],
+        answer: 1,
+      },
+    ],
   },
   data: {
     id: "data",
@@ -168,6 +280,38 @@ export const COURSE_DB = {
         id: "da_l3",
         title: "3. SQL Databases",
         video: "https://www.youtube.com/embed/HXV3zeQKqGY",
+      },
+    ],
+    quiz: [
+      {
+        question: "Which Python library is best for data manipulation?",
+        options: ["React", "Pandas", "Express", "Django"],
+        answer: 1,
+      },
+      {
+        question: "What does SQL stand for?",
+        options: [
+          "Structured Query Language",
+          "Simple Query Language",
+          "Strong Question Logic",
+          "Standard Query Logic",
+        ],
+        answer: 0,
+      },
+      {
+        question: "What is a DataFrame?",
+        options: [
+          "A picture frame",
+          "A 2D labeled data structure",
+          "A database server",
+          "A Python function",
+        ],
+        answer: 1,
+      },
+      {
+        question: "Which chart is best for showing trends over time?",
+        options: ["Pie Chart", "Line Chart", "Scatter Plot", "Bar Chart"],
+        answer: 1,
       },
     ],
   },
@@ -196,6 +340,49 @@ export const COURSE_DB = {
         video: "https://www.youtube.com/embed/fNzpcB7ODxQ",
       },
     ],
+
+    quiz: [
+      {
+        question: "What is a DDoS attack?",
+        options: [
+          "Distributed Denial of Service",
+          "Direct Data on System",
+          "Daily Data Output Service",
+          "Domain Drop of Server",
+        ],
+        answer: 0,
+      },
+      {
+        question: "What is Phishing?",
+        options: [
+          "Catching fish",
+          "Deceptive emails to steal info",
+          "A firewall type",
+          "An encryption algorithm",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What does a VPN do?",
+        options: [
+          "Makes your PC faster",
+          "Encrypts your internet traffic",
+          "Hacks wifi",
+          "Blocks ads",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What is a white-hat hacker?",
+        options: [
+          "A malicious hacker",
+          "An ethical security tester",
+          "A software engineer",
+          "A network admin",
+        ],
+        answer: 1,
+      },
+    ],
   },
   forex: {
     id: "forex",
@@ -219,6 +406,48 @@ export const COURSE_DB = {
         id: "fx_l3",
         title: "3. Risk Management",
         video: "https://www.youtube.com/embed/qO1lM7M-x7Q",
+      },
+    ],
+    quiz: [
+      {
+        question: "What is a 'Bull Market'?",
+        options: [
+          "Prices are falling",
+          "Prices are rising",
+          "Market is closed",
+          "High volatility",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What does a Stop-Loss order do?",
+        options: [
+          "Guarantees profit",
+          "Automatically closes a losing trade",
+          "Opens a new trade",
+          "Increases leverage",
+        ],
+        answer: 1,
+      },
+      {
+        question: "What is leverage in trading?",
+        options: [
+          "Borrowing capital to increase trade size",
+          "A type of chart",
+          "A risk-free trade",
+          "A currency pair",
+        ],
+        answer: 0,
+      },
+      {
+        question: "What does PIP stand for?",
+        options: [
+          "Percentage in Point",
+          "Price in Pattern",
+          "Profit in Pocket",
+          "Point in Price",
+        ],
+        answer: 0,
       },
     ],
   },
